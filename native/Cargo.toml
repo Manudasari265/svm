@@ -1,0 +1,24 @@
+cargo-features = ["edition2024"]
+[package]
+name = "svm"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[example]]
+name = "client"
+path = "examples/client.rs"
+
+[dependencies]
+processor = "0.1.1"
+solana-program = "1.18.26"
+
+[dev-dependencies]
+solana-client = "1.18.26"
+solana-program-test = "1.18.26"
+solana-sdk = "1.18.26"
+tokio = "1.44.1"
+
+
