@@ -2884,15 +2884,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "processor"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "654a9a85cc70e6990ede9d3c47d543b8b89904d935a4b0da013d9355c31103c5"
-dependencies = [
- "cfg-if",
-]
-
-[[package]]
 name = "qstring"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5039,7 +5030,7 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 name = "svm"
 version = "0.1.0"
 dependencies = [
- "processor",
+ "borsh 1.5.7",
  "solana-client",
  "solana-program",
  "solana-program-test",
