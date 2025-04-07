@@ -1,70 +1,12 @@
-// use solana_program::{
-//     account_info::AccountInfo, entrypoint, entrypoint::ProgramResult, msg, pubkey::Pubkey,
-// };
+#[cfg(not(feature = "no-entrypoint"))]
+mod entrypoint;
 
-// entrypoint!(process_instruction);
+pub mod error;
+pub mod instruction;
+pub mod state;
 
-// pub fn process_instruction(
-//     _program_id: &Pubkey,
-//     _accounts: &[AccountInfo],
-//     _instruction_data: &[u8],
-// ) -> ProgramResult {
-//     msg!("Hello, Solana!");
-//     Ok(())
-// }
+pub use instruction::*;
+pub use state::*;
 
-// #[cfg(test)]
-// mod test {
-//     use solana_program_test::*;
-//     use solana_sdk::{
-//         instruction::Instruction, pubkey::Pubkey, signature::Signer, transaction::Transaction,
-//     };
 
-//     #[tokio::test]
-//     async fn test_hello_world() {
-//         let program_id = Pubkey::new_unique();
-//         let mut program_test = ProgramTest::default();
-//         program_test.add_program("hello_world", program_id, None);
-//         let (mut banks_client, payer, recent_blockhash) = program_test.start().await;
-//         // Create instruction
-//         let instruction = Instruction {
-//             program_id,
-//             accounts: vec![],
-//             data: vec![],
-//         };
-//         // Create transaction with instruction
-//         let mut transaction = Transaction::new_with_payer(&[instruction], Some(&payer.pubkey()));
-
-//         // Sign transaction
-//         transaction.sign(&[&payer], recent_blockhash);
-
-//         let transaction_result = banks_client.process_transaction(transaction).await;
-//         assert!(transaction_result.is_ok());
-//     }
-// }
-
-// pub mod entrypoint;
-// pub mod instructions;
-// pub mod state;
-// pub mod processor;
-
-use solana_program::{
-    account_info::{next_account_info, AccountInfo},
-    entrypoint,
-    entrypoint::ProgramResult,
-    program::invoke,
-    pubkey::Pubkey,
-    program_error::ProgramError,
-    system_instruction,
-    sysvar::{rent::Rent, Sysvar},
-};
-
-entrypoint!(process_instruction);
-
-pub fn process_instruction (
-    program_id: &Pubkey,
-    accounts: &[AccountInfo],
-    instruction_data: &[u8],
-) -> ProgramResult {
-    Ok(())
-}
+solana_program::declare_id!("E5kv2j41SfsrZyCeEohk8SQ3i71Yzgiv32ey8ekeL5mQ");

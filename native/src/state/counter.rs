@@ -1,5 +1,4 @@
-
-#[derive(Debug, BorshDeserialize, BorshSerialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Counter {
-    pub count: u64
+    pub counter: u64
 }
