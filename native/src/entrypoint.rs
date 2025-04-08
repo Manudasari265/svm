@@ -16,22 +16,22 @@ pub fn process_instruction(
     instruction_data: &[u8],
 ) -> ProgramResult {
     // divide the instruction data into 2 parts
-    let (discriminator_variant, instruction_data) = instruction_data
+    let (discriminator_variant, _instruction_data) = instruction_data
               .split_first()
               .ok_or(ProgramError::InvalidInstructionData)?;
     
     match CounterInstruction::try_from(discriminator_variant)? {
         CounterInstruction::InitializeCounter{initial_value} => {
             msg!("Instruction Initialized");
-            instruction::process_counter_initialize(program_id, accounts, instruction_data, initial_value)?;
+            instruction::process_counter_initialize(program_id, accounts, initial_value)?;
         }
         CounterInstruction::IncrementCounter => {
             msg!("Increment Counter");
-            instruction::process_increment_counter(program_id, accounts, instruction_data)?;
+            instruction::process_increment_counter(program_id, accounts)?;
         }
         CounterInstruction::DecrementCounter => {
             msg!("Decrement Counter");
-            instruction::process_decrement_counter(program_id, accounts, instruction_data)?;
+            instruction::process_decrement_counter(program_id, accounts)?;
         }
     }
     

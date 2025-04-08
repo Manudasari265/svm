@@ -9,10 +9,13 @@ use crate::Counter;
 pub fn process_counter_initialize(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
-    instruction_data: &[u8],
     initial_value: u64,
 ) -> ProgramResult {
-    let [payer_account, counter_account, _sysvar_rent_program, system_program] = accounts else {
+    let [
+        payer_account, 
+        counter_account, 
+        _sysvar_rent_program, 
+        system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
@@ -45,7 +48,7 @@ pub fn process_counter_initialize(
     )?;
 
     let counter_data = Counter {
-        counter: initial_value,
+        count: initial_value,
     };
 
     let mut account_data = &mut counter_account.data.borrow_mut()[..];
