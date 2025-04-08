@@ -1,12 +1,12 @@
 import * as borsh from "borsh";
 
 export class CounterAccount {
-    count = 0;
+    count: BigInt;
 
     constructor({
         count,
     }: {
-        count: number
+        count: BigInt
     }) {
         this.count = count;
     }
@@ -19,5 +19,5 @@ export const schema: borsh.Schema = {
 };
 
 export const COUNTER_SIZE = borsh.serialize(schema, new CounterAccount({
-    count: 0
+    count: BigInt(0)
 })).length;

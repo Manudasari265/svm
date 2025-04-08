@@ -9,4 +9,4 @@ pub use instruction::*;
 pub use state::*;
 
 
-solana_program::declare_id!("E5kv2j41SfsrZyCeEohk8SQ3i71Yzgiv32ey8ekeL5mQ");
+solana_program::declare_id!("CXSvTq9VLfDSNPQGEAF8LF5YbpxZbMBbn5RzsvnGiQxw");
