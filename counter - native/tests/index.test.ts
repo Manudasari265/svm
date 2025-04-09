@@ -66,3 +66,8 @@ test('Account is initialized', async () => {
 
     expect(counter).toEqual(new CounterAccount({ count: BigInt(0)}));
 });
+
+
+test('Increment counter', async () => {
+    
+})
