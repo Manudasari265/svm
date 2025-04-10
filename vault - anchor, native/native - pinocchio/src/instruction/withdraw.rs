@@ -1,58 +1,77 @@
 use pinocchio::{
-    account_info::AccountInfo,
-    instruction::{Seed, Signer},
-    program_error::ProgramError,
+    account_info::AccountInfo, 
+    instruction::{Seed, Signer}, 
+    program_error::ProgramError, ProgramResult,
     pubkey::{self},
-    ProgramResult,
 };
+
 use pinocchio_system::instructions::Transfer;
 
-use crate::error::MyProgramError;
-
-pub fn process_withdraw(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
-    let [withdraw_acc, vault_acc, _system_program] = accounts else {
-        return Err(ProgramError::NotEnoughAccountKeys);
+use crate::
+    state::{
+        utils::load_ix_data, DataLen,
     };
 
-    if !withdraw_acc.is_signer() {
+use super::deposit::LAMPORTS_PER_SOL;
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WithdrawIxData {
+    pub amount: u64,
+    pub bump: u8,
+}
+
+impl DataLen for WithdrawIxData {
+    const LEN: usize = core::mem::size_of::<WithdrawIxData>();
+}
+
+pub fn process_withdraw (
+    accounts: &[AccountInfo],
+    data: &[u8],
+) -> ProgramResult {
+    let [payer_acc, vault_acc, _system_program] = accounts else {
+        return Err(ProgramError::NotEnoughAccountKeys)
+    };
+
+    if !payer_acc.is_signer() {
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    //if not empty is not a system account and if no lamports is not initialized
-    if !vault_acc.data_is_empty() && vault_acc.lamports() > 0 {
-        return Err(MyProgramError::InvalidAccount.into());
-    }
+    let ix_data = load_ix_data::<WithdrawIxData>(data)?;
 
-    let bump = data[0];
-
-    let seeds = [
-        "pinocchio_vault_pda".as_bytes(),
-        withdraw_acc.key(),
-        &[bump],
+    /* (Or) simply use the below code, it also does the same */
+    
+    let pda_seeds = [
+        b"pinocchio_vault_pda",
+        payer_acc.key().as_ref(),
+        &[ix_data.bump]
     ];
-    let vault_pda = pubkey::create_program_address(&seeds, &crate::ID)?;
+    let expected_vault_pda = pubkey::create_program_address(
+        &pda_seeds,
+        &crate::ID
+    )?;
 
-    //check if the vault belongs to the withdraw_acc
-    if vault_pda != *vault_acc.key() {
-        return Err(MyProgramError::IncorrectVaultAcc.into());
+    if expected_vault_pda != *vault_acc.key() {
+        return Err(ProgramError::InvalidSeeds);
     }
+    
 
-    let pda_byte_bump = [bump];
+    let binding = [ix_data.bump]; // this is the pda_bump_bytes 
+
+    // now we need to convrt the raw seeds back to pinochio seed types for invoke_signed()
     let signer_seeds = [
-        Seed::from("pinocchio_vault_pda".as_bytes()),
-        Seed::from(withdraw_acc.key()),
-        Seed::from(&pda_byte_bump),
+        Seed::from(b"pinocchio_vault_pda"),
+        Seed::from(payer_acc.key().as_ref()),
+        Seed::from(&binding),
     ];
-
-    let signer = [Signer::from(&signer_seeds)];
+    let signers = [Signer::from(&signer_seeds[..])];
 
     Transfer {
         from: vault_acc,
-        to: withdraw_acc,
-        lamports: vault_acc.lamports(),
+        to: payer_acc,
+        lamports: ix_data.amount * LAMPORTS_PER_SOL,
     }
-    .invoke_signed(&signer)?;
+    .invoke_signed(&signers)?;
 
     Ok(())
 }
-

@@ -12,14 +12,14 @@ pub enum VaultInstruction {
     Withdraw,
 }
 
-impl TryFrom<&u8> fro VaultInstruction {
+impl TryFrom<&u8> for VaultInstruction {
     type Error = ProgramError;
 
     fn try_from(value: &u8) -> Result<Self, Self::Error> {
         match *value {
-            0 => Ok(VaultInstruction::Deposit)
-            1 => Ok(VaultInstruction::Withdraw)
-            _ => Ok(ProgramError::InvalidInstructionData),
+            0 => Ok(VaultInstruction::Deposit),
+            1 => Ok(VaultInstruction::Withdraw),
+            _ => Err(ProgramError::InvalidInstructionData),
         }
     }
 }
