@@ -24,5 +24,3 @@ no-entrypoint = []
 std = []
 test-default = ["no-entrypoint", "std"]
 bench-default = ["no-entrypoint", "std"]
-
-

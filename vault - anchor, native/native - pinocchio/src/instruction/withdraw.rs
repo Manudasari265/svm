@@ -42,8 +42,8 @@ pub fn process_withdraw (
     /* (Or) simply use the below code, it also does the same */
     
     let pda_seeds = [
-        b"pinocchio_vault_pda",
-        payer_acc.key().as_ref(),
+        "pinocchio_vault_pda".as_bytes(),
+        payer_acc.key(),
         &[ix_data.bump]
     ];
     let expected_vault_pda = pubkey::create_program_address(
@@ -60,8 +60,8 @@ pub fn process_withdraw (
 
     // now we need to convrt the raw seeds back to pinochio seed types for invoke_signed()
     let signer_seeds = [
-        Seed::from(b"pinocchio_vault_pda"),
-        Seed::from(payer_acc.key().as_ref()),
+        Seed::from("pinocchio_vault_pda".as_bytes()),
+        Seed::from(payer_acc.key()),
         Seed::from(&binding),
     ];
     let signers = [Signer::from(&signer_seeds[..])];
@@ -69,7 +69,7 @@ pub fn process_withdraw (
     Transfer {
         from: vault_acc,
         to: payer_acc,
-        lamports: ix_data.amount * LAMPORTS_PER_SOL,
+        lamports: vault_acc.lamports(),
     }
     .invoke_signed(&signers)?;
 
