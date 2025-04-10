@@ -34,10 +34,6 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    if !vault_acc.data_is_empty() {
-        return Err(MyProgramError::InvalidAccount.into());
-    }
-
     let ix_data = load_ix_data::<DepositIxData>(data)?;
 
     let vault_pda = pubkey::create_program_address(
@@ -56,7 +52,7 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     Transfer {
         from: deposit_acc,
         to: vault_acc,
-        lamports: ix_data.amount as u64 * LAMPORTS_PER_SOL,
+        lamports: ix_data.amount * LAMPORTS_PER_SOL,
     }
     .invoke()?;
 
