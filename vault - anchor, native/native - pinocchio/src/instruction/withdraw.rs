@@ -12,8 +12,6 @@ use crate::
         utils::load_ix_data, DataLen,
     };
 
-use super::deposit::LAMPORTS_PER_SOL;
-
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WithdrawIxData {

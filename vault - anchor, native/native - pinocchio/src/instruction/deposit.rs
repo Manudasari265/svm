@@ -8,24 +8,19 @@ use pinocchio_system::instructions::Transfer;
 
 pub const LAMPORTS_PER_SOL: u64 = 1_000_000_000;
 
-use crate::{
-    error::MyProgramError,
-    state::{load_ix_data, DataLen},
-};
+use crate::state::{load_ix_data, DataLen};
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct DepositIxData {
+pub struct DepositIxtData {
     pub amount: u64,
     pub bump: u8,
 }
 
-impl DataLen for DepositIxData {
-    const LEN: usize = core::mem::size_of::<DepositIxData>();
+impl DataLen for DepositIxtData {
+    const LEN: usize = core::mem::size_of::<DepositIxtData>();
 }
 
 pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
-    // checks for accounts
     let [deposit_acc, vault_acc, _system_program] = accounts else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
@@ -34,7 +29,7 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         return Err(ProgramError::MissingRequiredSignature);
     }
 
-    let ix_data = load_ix_data::<DepositIxData>(data)?;
+    let ix_data = load_ix_data::<DepositIxtData>(data)?;
 
     let vault_pda = pubkey::create_program_address(
         &[
@@ -44,7 +39,6 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
         ],
         &crate::ID,
     )?;
-
     if vault_acc.key() != &vault_pda {
         return Err(ProgramError::InvalidAccountData);
     }
@@ -52,13 +46,9 @@ pub fn process_deposit(accounts: &[AccountInfo], data: &[u8]) -> ProgramResult {
     Transfer {
         from: deposit_acc,
         to: vault_acc,
-        lamports: ix_data.amount * LAMPORTS_PER_SOL,
+        lamports: ix_data.amount as u64 * LAMPORTS_PER_SOL,
     }
     .invoke()?;
 
     Ok(())
 }
-
-
-
-
