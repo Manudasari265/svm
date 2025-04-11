@@ -7,13 +7,6 @@ use pinocchio::{
     ProgramResult,
 };
 
-#[repr(C)]
-pub struct MakerOfferIxData {
-    pub bump: u8, //? user's canonical bump
-    pub amount_mint_a: [u8; 8], //? amount of TokenA
-    pub amount_mint_b: [u8; 8], //? amount of TokenB
-}
-
 impl DataLen for MakerOfferIxData {
     const LEN: usize = core::mem::size_of<MakerOfferIxData>();
 }
@@ -27,14 +20,42 @@ pub fn process_make_offer_instruction (
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    let (maker_acc, mint_x, mint_y, maker_ata, vault_acc, escrow_pda, _system_program, _token_program, _remaining @..) = accounts
+    ///? Steps to process the instruction:
+    /// extract the required accounts from the `accounts: &[AccountInfo]`` array
+    /// mention fail safe checks for the accounts and data length
+    /// check if the maker account is a signer
+    /// extract the bump seeds from the instruction data and bind seeds for the PDA validation
+    /// create the PDA for the escrow account and validate the PDA
+    /// for the vault account, we can either create a new one or use it from the instruction data
+    /// verify if vault is owned by the escrow program
+    /// check if the escrow account is initialized
+    /// check if the vault account is initialized
+    /// Create the account for escrow with the required space 
+    /// initialize the escrow account with the required data
+    /// transfer the tokens from the maker to the vaultq
+    
+    //? extract the required accounts from the `accounts: &[AccountInfo]`` array
+    let (maker_acc, mint_x, mint_y, maker_ata, vault, escrow_acc, _system_program, _token_program, _remaining @..) = accounts
       else {
         return Err(ProgramError::NotEnoughAccountKeys);
     };
 
+    //? check if the maker account is a signer
     if !maker_acc.is_signer() {
         return Err(ProgramError::MissingRequiredSignature);
     }
+
+    //? mention fail safe checks for the accounts and data length
+    if instruction_data.len() != MakerOfferIxData::LEN {
+        return Err(ProgramError::InvalidInstructionData);
+    }
+
+    //? extract the bump seeds from the instruction data and bind seeds for the PDA validation
+    let bump = unsafe {
+        *(instruction_data.as_ptr() as *const u8)
+    }.to_le_bytes();
+    let seed = [(b"escrow"), maker_acc.key().as_slice(), bump.as_ref()];
+    let seeds = &seed[..];
 
     
     Ok(())
