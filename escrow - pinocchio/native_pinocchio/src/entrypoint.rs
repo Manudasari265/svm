@@ -14,10 +14,14 @@ nostd_panic_handler!();
 
 #[inline(always)]
 fn process_instruction(
-    _program_id: &Pubkey,
+    program_id: &Pubkey,
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
+    if program_id.ne(&crate::ID) {
+        return Err(ProgramError::IncorrectProgramId);
+    }
+    
     let (discriminator_variant, instruction_data) = instruction_data
             .split_first()
             .ok_or(ProgramError::InvalidInstructionData)?;
@@ -25,11 +29,11 @@ fn process_instruction(
     match EscrowInstruction::try_from(discriminator_variant) {
         EscrowInstruction::MakeOffer => {
             log!("Ix:0");
-            instruction::process_make_offer(accounts, instruction_data)
+            instruction::process_make_offer_instruction(accounts, instruction_data)
         }
         EscrowInstruction::TakeOffer => {
             log!("Ix:1");
-            instruction::process_take_offer(accounts, instruction_data)
+            instruction::process_take_offer_instruction(accounts, instruction_data)
         }
     }
 
